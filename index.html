@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firematrix — Minecraft Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ── Reset & Base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-hover: #1c1c2a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --accent-orange: #f26322;
+            --accent-red: #e03a1a;
+            --accent-glow: rgba(242, 99, 34, 0.35);
+            --border-glow: rgba(242, 99, 34, 0.2);
+            --shadow-glow: 0 0 30px rgba(242, 99, 34, 0.08);
+            --radius: 14px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --discord-blue: #5865F2;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-orange);
+            border-radius: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            outline: none;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── Glow Orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            top: -200px;
+            right: -150px;
+            background: var(--accent-orange);
+        }
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -150px;
+            left: -150px;
+            background: var(--accent-red);
+            opacity: 0.15;
+        }
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--accent-orange);
+            opacity: 0.05;
+        }
+
+        /* ── Header ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(18px) saturate(1.2);
+            border-bottom: 1px solid rgba(242, 99, 34, 0.08);
+            padding: 16px 0;
+            transition: var(--transition);
+        }
+        header.scrolled {
+            background: rgba(10, 10, 15, 0.94);
+            border-bottom-color: rgba(242, 99, 34, 0.18);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.7rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f26322, #ff8c42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo i {
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--accent-orange);
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            transition: var(--transition);
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .nav-links a.active-cat {
+            color: #fff;
+        }
+        .nav-links a.active-cat::after {
+            width: 100%;
+        }
+
+        .discord-header-btn {
+            background: var(--discord-blue);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .discord-header-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(88, 101, 242, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            padding: 4px;
+        }
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: #fff;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 70px 0 50px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.4rem, 7vw, 4.8rem);
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 30%, #f26322 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 32px;
+        }
+        .hero .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 24px;
+            margin-top: 8px;
+        }
+        .hero .badge-row span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .hero .badge-row i {
+            color: var(--accent-orange);
+            margin-right: 6px;
+        }
+
+        .hero .discord-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--discord-blue);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 12px;
+            transition: var(--transition);
+            box-shadow: 0 0 40px rgba(88, 101, 242, 0.2);
+        }
+        .hero .discord-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(88, 101, 242, 0.35);
+        }
+        .hero .discord-cta i {
+            font-size: 1.5rem;
+        }
+
+        /* ── Section Titles ── */
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section-sub {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 32px;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* ── About Section ── */
+        .about-section {
+            position: relative;
+            z-index: 1;
+            padding: 50px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .about-text p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 16px;
+            line-height: 1.8;
+        }
+        .about-text .highlight {
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .stat-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(242, 99, 34, 0.15);
+            transform: translateY(-2px);
+        }
+        .stat-card .number {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.2rem;
+            color: var(--accent-orange);
+            display: block;
+        }
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        /* ── Why Choose Us ── */
+        .why-section {
+            position: relative;
+            z-index: 1;
+            padding: 50px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .why-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .why-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(242, 99, 34, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow);
+        }
+        .why-card .why-icon {
+            font-size: 2.8rem;
+            color: var(--accent-orange);
+            margin-bottom: 16px;
+            display: block;
+            filter: drop-shadow(0 0 12px var(--accent-glow));
+        }
+        .why-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .why-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* ── Categories ── */
+        .categories {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0 40px;
+        }
+        .category-tab {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-tab:hover {
+            background: rgba(242, 99, 34, 0.08);
+            border-color: rgba(242, 99, 34, 0.2);
+            color: #fff;
+        }
+        .category-tab.active {
+            background: rgba(242, 99, 34, 0.15);
+            border-color: var(--accent-orange);
+            color: #fff;
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+        .category-tab i {
+            font-size: 1rem;
+        }
+
+        /* ── Products Grid ── */
+        .products-section {
+            position: relative;
+            z-index: 1;
+            padding-bottom: 60px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 24px 20px 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .product-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(242, 99, 34, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow), 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-icon {
+            font-size: 2.2rem;
+            color: var(--accent-orange);
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+        .product-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .product-card .category-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: inline-block;
+            background: rgba(242, 99, 34, 0.08);
+            padding: 2px 12px;
+            border-radius: 40px;
+        }
+        .product-card .desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex: 1;
+            margin-bottom: 16px;
+        }
+        .product-card .price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: auto;
+            flex-wrap: wrap;
+        }
+        .product-card .price {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+        .product-card .price small {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .purchase-discord-btn {
+            background: var(--discord-blue);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .purchase-discord-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(88, 101, 242, 0.3);
+        }
+        .purchase-discord-btn:active {
+            transform: scale(0.96);
+        }
+        .purchase-discord-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* ── Availability Section ── */
+        .availability-section {
+            position: relative;
+            z-index: 1;
+            padding: 50px 0 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .availability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .avail-item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: var(--transition);
+        }
+        .avail-item:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(242, 99, 34, 0.1);
+        }
+        .avail-item .avail-icon {
+            font-size: 1.6rem;
+            color: var(--accent-orange);
+            width: 44px;
+            text-align: center;
+        }
+        .avail-item .avail-info {
+            flex: 1;
+        }
+        .avail-item .avail-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .avail-item .avail-info .stock {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .stock.in-stock {
+            background: rgba(26, 138, 74, 0.2);
+            color: #4ade80;
+        }
+        .stock.limited {
+            background: rgba(242, 99, 34, 0.15);
+            color: var(--accent-orange);
+        }
+        .stock.out-of-stock {
+            background: rgba(224, 58, 26, 0.15);
+            color: #f87171;
+        }
+
+        /* ── Footer ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 40px 0 28px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        footer .footer-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f26322, #ff8c42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.2rem;
+        }
+        footer .socials {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 16px 0 12px;
+        }
+        footer .socials a {
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            transition: var(--transition);
+        }
+        footer .socials a:hover {
+            color: var(--accent-orange);
+            transform: translateY(-2px);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--bg-card);
+            border: 1px solid rgba(242, 99, 34, 0.2);
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 500;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+            color: #fff;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: all;
+        }
+        .toast i {
+            color: var(--discord-blue);
+            font-size: 1.3rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 820px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: var(--bg-secondary);
+                padding: 20px;
+                border-radius: var(--radius);
+                border: 1px solid rgba(255, 255, 255, 0.04);
+                gap: 16px;
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .hamburger {
+                display: flex;
+            }
+            .header-inner {
+                flex-wrap: wrap;
+            }
+            .discord-header-btn {
+                margin-left: auto;
+            }
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .about-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 18px;
+            }
+            .availability-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+            .why-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .container {
+                padding: 0 16px;
+            }
+            .hero {
+                padding: 40px 0 30px;
+            }
+            .hero .discord-cta {
+                padding: 14px 28px;
+                font-size: 0.95rem;
+            }
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+            .product-card {
+                padding: 16px 14px 16px;
+            }
+            .product-card h3 {
+                font-size: 0.95rem;
+            }
+            .product-card .price {
+                font-size: 1.1rem;
+            }
+            .purchase-discord-btn {
+                padding: 8px 12px;
+                font-size: 0.7rem;
+            }
+            .purchase-discord-btn span {
+                display: none;
+            }
+            .category-tab {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+            .logo {
+                font-size: 1.3rem;
+            }
+            .logo i {
+                font-size: 1.5rem;
+            }
+            .about-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 16px 12px;
+            }
+            .stat-card .number {
+                font-size: 1.6rem;
+            }
+            .availability-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .avail-item {
+                padding: 14px 12px;
+            }
+            .avail-item .avail-icon {
+                font-size: 1.2rem;
+                width: 34px;
+            }
+            .why-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+            .why-card {
+                padding: 20px 16px;
+            }
+            .why-card .why-icon {
+                font-size: 2rem;
+            }
+            .discord-header-btn span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .product-card .desc {
+                font-size: 0.75rem;
+            }
+            .product-card .price {
+                font-size: 0.95rem;
+            }
+            .purchase-discord-btn {
+                padding: 6px 10px;
+                font-size: 0.65rem;
+            }
+            .purchase-discord-btn i {
+                font-size: 0.8rem;
+            }
+        }
+
+        .text-glow {
+            text-shadow: 0 0 30px var(--accent-glow);
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- ─── HEADER ─── -->
+    <header id="header">
+        <div class="container header-inner">
+            <a href="#" class="logo">
+                <i class="fas fa-fire-flame-curved"></i>
+                Firematrix
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about">About</a></li>
+                <li><a href="#why">Why Us</a></li>
+                <li><a href="#products" data-category="all" class="active-cat">Store</a></li>
+                <li><a href="#availability">Availability</a></li>
+            </ul>
+
+            <a href="https://discord.gg/J68CR6RYGQ" target="_blank" class="discord-header-btn">
+                <i class="fab fa-discord"></i>
+                <span>Join Discord</span>
+            </a>
+
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ─── HERO ─── -->
+    <section class="hero">
+        <div class="container">
+            <h1>Ignite Your <br />Minecraft&nbsp;Server</h1>
+            <p>
+                Premium setups, configs, mods, plugins, skripts &amp; Discord templates —
+                crafted by experts to fuel your community. <strong style="color:#fff;">Purchase via Discord.</strong>
+            </p>
+            <div class="badge-row">
+                <span><i class="fas fa-bolt"></i> Instant Delivery</span>
+                <span><i class="fas fa-shield"></i> Secure Checkout</span>
+                <span><i class="fas fa-headset"></i> 24/7 Support</span>
+                <span><i class="fab fa-discord"></i> Discord Store</span>
+            </div>
+            <a href="https://discord.gg/J68CR6RYGQ" target="_blank" class="discord-cta">
+                <i class="fab fa-discord"></i>
+                Purchase on Discord &rarr;
+            </a>
+        </div>
+    </section>
+
+    <!-- ─── ABOUT SECTION ─── -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Firematrix</h2>
+                <p class="section-sub">We craft premium Minecraft &amp; Discord solutions for passionate server owners.</p>
+            </div>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>
+                        <span class="highlight">Firematrix</span> is a dedicated team of developers, configurators, and
+                        creatives who live and breathe Minecraft. We specialize in building <span class="highlight">high-performance</span>
+                        server setups, polished configurations, custom mods, powerful plugins, intuitive skripts, and
+                        stunning Discord templates.
+                    </p>
+                    <p>
+                        Every product we release is <span class="highlight">battle-tested</span> on production servers,
+                        optimized for performance, and designed to give your community the edge it deserves. We believe
+                        in quality over quantity — each file is carefully crafted and documented.
+                    </p>
+                    <p style="margin-top:8px;">
+                        <i class="fas fa-arrow-right" style="color:var(--accent-orange);margin-right:8px;"></i>
+                        All purchases are handled directly through our <span class="highlight">Discord server</span> for
+                        fast, secure, and personal service.
+                    </p>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-card">
+                        <span class="number">120+</span>
+                        <span class="label">Products Delivered</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">87%</span>
+                        <span class="label">Satisfaction Rate</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">4.2★</span>
+                        <span class="label">Average Rating</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="number">300+</span>
+                        <span class="label">Community Members</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── WHY CHOOSE US ─── -->
+    <section class="why-section" id="why">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose Firematrix</h2>
+                <p class="section-sub">What sets us apart from the rest.</p>
+            </div>
+            <div class="why-grid">
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-rocket"></i></span>
+                    <h4>Instant Delivery</h4>
+                    <p>Get your products immediately after purchase. No waiting, no delays — just pure speed.</p>
+                </div>
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-shield-halved"></i></span>
+                    <h4>Premium Quality</h4>
+                    <p>Every file is hand-crafted, thoroughly tested, and optimized for the best performance.</p>
+                </div>
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-headset"></i></span>
+                    <h4>Expert Support</h4>
+                    <p>Our team is available around the clock to help with setup, configuration, and troubleshooting.</p>
+                </div>
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-arrows-rotate"></i></span>
+                    <h4>Lifetime Updates</h4>
+                    <p>All products come with free updates for life. You'll always have the latest and greatest.</p>
+                </div>
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-users"></i></span>
+                    <h4>Community Driven</h4>
+                    <p>We listen to our community. New features and products are shaped by your feedback.</p>
+                </div>
+                <div class="why-card">
+                    <span class="why-icon"><i class="fas fa-download"></i></span>
+                    <h4>Easy Installation</h4>
+                    <p>Clear documentation and step-by-step guides make setup a breeze for any skill level.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── CATEGORIES + PRODUCTS ─── -->
+    <section class="products-section" id="products">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Products</h2>
+                <p class="section-sub">Browse our catalog and purchase directly on Discord.</p>
+            </div>
+
+            <div class="categories" id="categoryTabs">
+                <button class="category-tab active" data-category="all"><i class="fas fa-grid-2"></i> All</button>
+                <button class="category-tab" data-category="setups"><i class="fas fa-server"></i> Setups</button>
+                <button class="category-tab" data-category="configs"><i class="fas fa-sliders"></i> Configs</button>
+                <button class="category-tab" data-category="mods"><i class="fas fa-cubes"></i> Mods</button>
+                <button class="category-tab" data-category="plugins"><i class="fas fa-puzzle-piece"></i> Plugins</button>
+                <button class="category-tab" data-category="skripts"><i class="fas fa-code"></i> Skripts</button>
+                <button class="category-tab" data-category="discord"><i class="fab fa-discord"></i> Discord</button>
+            </div>
+            
+
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+    </section>
+
+    <!-- ─── AVAILABILITY SECTION ─── -->
+    <section class="availability-section" id="availability">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Availability</h2>
+                <p class="section-sub">Real-time stock status for all our product categories.</p>
+            </div>
+            <div class="availability-grid" id="availabilityGrid">
+                <!-- rendered by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── FOOTER ─── -->
+    <footer>
+        <div class="container">
+            <div class="footer-brand">⚡ Firematrix</div>
+            <div class="socials">
+                <a href="https://discord.gg/J68CR6RYGQ" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            </div>
+            <p style="font-size:0.8rem;opacity:0.5;">
+                &copy; 2026 Firematrix — Fuel your creativity. <br />
+                <span style="font-size:0.75rem;">All purchases are processed via Discord.</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- ─── TOAST ─── -->
+    <div class="toast" id="toast">
+        <i class="fab fa-discord"></i>
+        <span id="toastMsg">Redirecting to Discord...</span>
+    </div>
+
+    <script>
+        // ─── DATA ───────────────────────────────────────────────
+        // Prices are in USD; we'll convert to INR using fixed exchange rate.
+        const EXCHANGE_RATE = 20; // 1 USD = 83 INR
+
+        const products = [{
+            id: 1,
+            name: 'Donut SMP Setup',
+            category: 'setups',
+            icon: 'fa-server',
+            desc: 'Complete donut smp pack with essentials, economy, and rank system.',
+            priceUSD: 10,
+        }, {
+            id: 2,
+            name: 'Animated RTP',
+            category: 'configs',
+            icon: 'fa-sliders',
+            desc: 'RTP config for animated version gui, looks premium.',
+            priceUSD: 5,
+        }, {
+            id: 3,
+            name: 'VeinMiner Mod',
+            category: 'mods',
+            icon: 'fa-cubes',
+            desc: 'Mine entire ore veins with a single swing. Fully configurable.',
+            priceUSD: 0,
+        }, {
+            id: 4,
+            name: 'land claim paid plugin',
+            category: 'plugins',
+            icon: 'fa-puzzle-piece',
+            desc: 'Premium land clsim plugin with claim,disclaim,trust,private features.',
+            priceUSD: 6,
+        }, {
+            id: 5,
+            name: 'Bank Skript',
+            category: 'skripts',
+            icon: 'fa-code',
+            desc: 'Bank skript for banking feature including withraw deposit and intrests.',
+            priceUSD: 7,
+        }, {
+            id: 6,
+            name: 'Gaming Community Discord',
+            category: 'discord',
+            icon: 'fab fa-discord',
+            desc: 'Complete Discord template with auto-roles, moderation, and gaming stats.',
+            priceUSD: 0.4,
+        }, {
+            id: 7,
+            name: 'Minedeath lifesteal Setup',
+            category: 'setups',
+            icon: 'fa-server',
+            desc: 'A full setuped lifesteal setup for your lifesteal server.',
+            priceUSD: 8,
+        }, {
+            id: 8,
+            name: 'Shop GUI',
+            category: 'configs',
+            icon: 'fa-sliders',
+            desc: 'Coustom shop gui with useful sections for selling and buying.',
+            priceUSD: 6,
+        }, {
+            id: 9,
+            name: 'Biomes O\' Plenty Mod',
+            category: 'mods',
+            icon: 'fa-cubes',
+            desc: 'Adds 80+ new biomes, plants, and building materials to your world.',
+            priceUSD: 0,
+        }, {
+            id: 10,
+            name: 'Deluxe Announces',
+            category: 'plugins',
+            icon: 'fa-puzzle-piece',
+            desc: 'A plugin eith advanced announcement system on your minecraft servers.',
+            priceUSD: 4,
+        }, {
+            id: 11,
+            name: 'Xray Alerts',
+            category: 'skripts',
+            icon: 'fa-code',
+            desc: 'A Premium skript which shows alert on using xray.',
+            priceUSD: 8,
+        }, {
+            id: 12,
+            name: 'Streamer Discord Template',
+            category: 'discord',
+            icon: 'fab fa-discord',
+            desc: 'Discord template for streamers: alerts, fan roles, and giveaways.',
+            priceUSD: 0,
+        }, {
+            id: 13,
+            name: 'Skywar setup',
+            category: 'setups',
+            icon: 'fa-server',
+            desc: 'A skyblock server setup with skywar system.',
+            priceUSD: 8,
+        }, {
+            id: 14,
+            name: 'Tab',
+            category: 'configs',
+            icon: 'fa-sliders',
+            desc: 'Premium config for scoreboard and player information.',
+            priceUSD: 6,
+        }, {
+            id: 15,
+            name: 'Create Mod',
+            category: 'mods',
+            icon: 'fa-cubes',
+            desc: 'Engineering mod with mechanical power, trains, and automation.',
+            priceUSD: 0,
+        }, {
+            id: 16,
+            name: 'Global market plus',
+            category: 'plugins',
+            icon: 'fa-puzzle-piece',
+            desc: 'The ultimate premium market plugin with settled items.',
+            priceUSD: 4,
+        }, {
+            id: 17,
+            name: 'Chat games skript',
+            category: 'skripts',
+            icon: 'fa-code',
+            desc: 'Skript for chat games with exciting rewards.',
+            priceUSD: 8,
+        }, {
+            id: 18,
+            name: 'Roleplay Discord Template',
+            category: 'discord',
+            icon: 'fab fa-discord',
+            desc: 'RP-focused Discord template with lore channels, character sheets, dice.',
+            priceUSD: 0,
+        }, ];
+
+        // Availability data (product stock status)
+        const availabilityData = [
+            { id: 1, name: 'Setups', icon: 'fa-server', stock: 'limited', label: 'Limited' },
+            { id: 2, name: 'Configs', icon: 'fa-sliders', stock: 'limited', label: 'Limited' },
+            { id: 3, name: 'Mods', icon: 'fa-cubes', stock: 'limited', label: 'Limited' },
+            { id: 4, name: 'Plugins', icon: 'fa-puzzle-piece', stock: 'limited', label: 'Limited' },
+            { id: 5, name: 'Skripts', icon: 'fa-code', stock: 'limited', label: 'Limited' },
+            { id: 6, name: 'Discord Templates', icon: 'fab fa-discord', stock: 'limited', label: 'Limited' },
+        ];
+
+        // ─── DISCORD INVITE ─────────────────────────────────────
+        const DISCORD_INVITE = 'https://discord.gg/J68CR6RYGQ';
+
+        // ─── DOM REFS ──────────────────────────────────────────
+        const grid = document.getElementById('productsGrid');
+        const availabilityGrid = document.getElementById('availabilityGrid');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const navCatLinks = document.querySelectorAll('.nav-links a[data-category]');
+
+        let currentCategory = 'all';
+        let toastTimer = null;
+
+        // ─── HELPERS ───────────────────────────────────────────
+        function formatINR(amountUSD) {
+            const inr = amountUSD * EXCHANGE_RATE;
+            return '₹' + inr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // ─── RENDER PRODUCTS ──────────────────────────────────
+        function renderProducts(category = 'all') {
+            const filtered = category === 'all' ?
+                products :
+                products.filter(p => p.category === category);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                        <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-secondary);">
+                            <i class="fas fa-box-open" style="font-size:2.5rem;opacity:0.3;margin-bottom:12px;display:block;"></i>
+                            No products in this category yet.
+                        </div>
+                    `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                    <div class="product-card" data-id="${p.id}">
+                        <div class="product-icon"><i class="fas ${p.icon}"></i></div>
+                        <span class="category-label">${p.category}</span>
+                        <h3>${p.name}</h3>
+                        <p class="desc">${p.desc}</p>
+                        <div class="price-row">
+                            <span class="price">${formatINR(p.priceUSD)} <small>INR</small></span>
+                            <button class="purchase-discord-btn" data-id="${p.id}" data-name="${p.name}">
+                                <i class="fab fa-discord"></i>
+                                <span>Purchase</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            // Attach purchase events
+            document.querySelectorAll('.purchase-discord-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const name = btn.dataset.name;
+                    redirectToDiscord(name);
+                });
+            });
+        }
+
+        // ─── RENDER AVAILABILITY ──────────────────────────────
+        function renderAvailability() {
+            availabilityGrid.innerHTML = availabilityData.map(item => `
+                    <div class="avail-item">
+                        <div class="avail-icon"><i class="fas ${item.icon}"></i></div>
+                        <div class="avail-info">
+                            <h4>${item.name}</h4>
+                            <span class="stock ${item.stock}">${item.label}</span>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // ─── REDIRECT TO DISCORD ──────────────────────────────
+        function redirectToDiscord(productName) {
+            showToast(`🛒 Purchasing "${productName}" — redirecting to Discord...`);
+            setTimeout(() => {
+                window.open(DISCORD_INVITE, '_blank');
+            }, 800);
+        }
+
+        // ─── TOAST ─────────────────────────────────────────────
+        function showToast(msg) {
+            toastMsg.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // ─── CATEGORY FILTERING ──────────────────────────────
+        function setCategory(category) {
+            currentCategory = category;
+            renderProducts(category);
+
+            categoryTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.category === category);
+            });
+            navCatLinks.forEach(link => {
+                link.classList.toggle('active-cat', link.dataset.category === category);
+            });
+
+            navLinks.classList.remove('open');
+        }
+
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => setCategory(tab.dataset.category));
+        });
+
+        navCatLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                setCategory(link.dataset.category);
+                document.querySelector('.products-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ─── HAMBURGER ─────────────────────────────────────────
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+        });
+
+        // ─── HEADER SCROLL SHADOW ─────────────────────────────
+        window.addEventListener('scroll', () => {
+            document.getElementById('header').classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // ─── INIT ──────────────────────────────────────────────
+        renderProducts('all');
+        renderAvailability();
+
+        console.log('🔥 Firematrix — Purchase via Discord');
+        console.log(`📌 Discord invite: ${DISCORD_INVITE}`);
+        console.log(`💱 Exchange rate: 1 USD = ${EXCHANGE_RATE} INR`);
+    </script>
+</body>
+</html>
